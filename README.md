@@ -76,13 +76,18 @@ MCP 在默认特性里，`bench --schema` 打印的 30 秒「结构化工具定�
 
 ## 定时跑
 
-- **Windows**：任务计划程序每天 05:30 跑 `lyco-model-bench daily --out ...\results`
-  （本机已注册同名任务）。
-- **Linux / Radxa（常开机）**：cron：
+仓库根部带了两个每日入口脚本（内部就是 `daily` 命令；release 二进制不存在时
+会自动先 `cargo build --release --locked`）：
+
+- **Windows**：`run_daily.cmd` —— 任务计划程序每天 05:30 跑它（本机已注册的同名
+  任务就指向这个文件）。
+- **Linux / Radxa（常开机）**：`run_daily.sh` —— cron：
 
 ```cron
-30 5 * * * radxa /home/radxa/lyco-model-bench/target/release/lyco-model-bench daily --out /home/radxa/lyco-model-bench/results >> /home/radxa/lyco-model-bench/results/cron.log 2>&1
+30 5 * * * radxa /home/radxa/lyco-model-bench/run_daily.sh >> /home/radxa/lyco-model-bench/results/cron.log 2>&1
 ```
+
+结果与日志都落在 `results/`（gitignored，不进仓库）。
 
 ## 结果
 
@@ -105,9 +110,9 @@ benchmark**——测速需要真实 API keys，而且每天的结果本来就该
 
 ## Python 旧版
 
-`python/` 里有 `bench.py`（纯标准库）+ `run_daily.cmd` / `run_daily.sh`，是本工具的
-Python 原型。Rust 版功能等价（还多出 MCP / TUI / Web 三端），旧脚本保留供回看，
-不再演进。
+`python/` 里有 `bench.py`（纯标准库）+ 它自己的 `run_daily.cmd` / `run_daily.sh`，
+是本工具的 Python 原型。Rust 版功能等价（还多出 MCP / TUI / Web 三端），
+每日入口在仓库根部的 `run_daily.cmd` / `run_daily.sh`。旧脚本保留供回看，不再演进。
 
 ## License
 
