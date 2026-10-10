@@ -1,0 +1,38 @@
+[package]
+name = "lyco-model-bench"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "每日模型发现 + token 测速：NIM / OpenRouter 的模型供给每天都在变，本工具每天列出可用模型、剔除卡死/下线的、实测中文回答的 token 速度，输出带推荐的报告。lilyco 一个 struct 出 CLI/TUI/Web/MCP 四端。"
+repository = "https://github.com/lilyco-42/lyco-model-bench"
+keywords = ["cli", "mcp", "llm", "benchmark"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "lyco-model-bench"
+path = "src/main.rs"
+
+[dependencies]
+# 门面：默认只取 CLI + MCP（纯 Rust，aarch64 可编，无 crossterm/tokio-web）
+# 应用 crate 只依赖 facade：core 类型走 lilyco::prelude::*
+lilyco = { version = "0.2", default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# HTTP：同步、纯 Rust（rustls）的极小客户端。本工具只发一次 GET / 一次 POST 并读回
+# 流式响应，不需要异步运行时——对比 reqwest 会拖入 tokio + hyper，属「最小依赖」守则。
+ureq = { version = "2", default-features = false, features = ["tls"] }
+
+[features]
+default = []
+# 桌面想用 TUI / Web 界面时再开：
+tui = ["lilyco/tui"]
+web = ["lilyco/web"]
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
